@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Hillrange CA1 Dashboard</title>
+
+  <!-- Fonts from Google -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=Zilla+Slab:wght@500;600&display=swap">
+
+  <!-- Our own styles (colours, layout, sizes) -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="wrap">
+  <header class="mast">
+    <div>
+      <span class="eyebrow">Hillrange School · Continuous assessment</span>
+      <h1 id="title">CA1 result dashboard</h1>
+      <p class="sub" id="subtitle"></p>
+    </div>
+    <div class="actions">
+      <button class="btn primary" id="btn-upload" type="button">Upload a score sheet</button>
+      <button class="btn" id="btn-refresh" type="button">Refresh</button>
+      <button class="btn" id="btn-clear" type="button">Clear</button>
+      <button class="btn" id="btn-settings" type="button" aria-expanded="false" aria-controls="panel">Settings</button>
+      <input type="file" id="file" accept=".xlsx,.xlsm,.xls,.csv" hidden>
+    </div>
+  </header>
+
+  <p class="note" id="status" role="status" hidden></p>
+
+  <section class="panel" id="empty" hidden>
+    <h3>No score sheet loaded</h3>
+    <p class="note">Select Upload a score sheet and choose an Excel file. It needs a row of headings: student name, one column per subject, and a CLASS column.</p>
+  </section>
+
+  <section class="panel" id="panel" hidden>
+    <div>
+      <h3>Data and settings</h3>
+      <p class="note" id="source-note"></p>
+    </div>
+    <div class="fields">
+      <div class="field"><label for="sel-a">Score sheet</label><select id="sel-a"></select></div>
+      <div class="field"><label for="max-a">Marks obtainable per subject</label><input id="max-a" type="number" min="1" step="1"></div>
+      <div class="field"><label for="lab-a">Assessment name</label><input id="lab-a" type="text" maxlength="14"></div>
+    </div>
+    <div class="fields">
+      <div class="field"><label for="group">Year group name</label><input id="group" type="text" maxlength="30"></div>
+      <div class="field"><label for="pass">Pass mark (average, %)</label><input id="pass" type="number" min="0" max="100" step="1"></div>
+      <div class="field"><label for="support">Needs support below (average, %)</label><input id="support" type="number" min="0" max="100" step="1"></div>
+    </div>
+    <p class="note">The sheet needs a row of headings: student name, one column per subject, and a CLASS column. Leave a subject blank for students who do not offer it. Serial numbers, totals, rank, pass/fail, average and score range are ignored and recalculated here.</p>
+    <p class="note warn" id="panel-msg" hidden></p>
+    <div class="rowline">
+      <button class="btn primary" id="btn-apply" type="button">Update dashboard</button>
+    </div>
+  </section>
+
+  <div id="dash">
+  <div class="filters" id="filters"></div>
+
+  <section class="kpis" id="kpis" aria-label="Headline figures"></section>
+
+  <section class="block">
+    <header><h2 id="ins-title">What the results say</h2><p class="sub" id="ins-sub"></p></header>
+    <ul class="insights" id="insights"></ul>
+  </section>
+
+  <hr class="rule">
+
+  <section class="block">
+    <header><h2>Subject scores by class</h2><p class="sub" id="grp-sub">Average score of each class in every subject, in percent.</p></header>
+    <div class="legend" id="legend-grp"></div>
+    <div class="scroll" id="chart-grp"></div>
+  </section>
+
+  <hr class="rule">
+
+  <section class="grid2">
+    <div class="block">
+      <header><h2>Subject averages</h2><p class="sub" id="subj-sub"></p></header>
+      <div id="chart-subj"></div>
+    </div>
+    <div class="stack">
+      <div class="block">
+        <header><h2>Class averages</h2><p class="sub">Average score of each class across all subjects, in percent.</p></header>
+        <div id="chart-class"></div>
+      </div>
+      <div class="block">
+        <header><h2>Pass and fail</h2><p class="sub" id="pf-sub"></p></header>
+        <div class="ring" id="chart-pf"></div>
+      </div>
+      <div class="block">
+        <header><h2>Score distribution</h2><p class="sub">Students by average score band, with each band's share.</p></header>
+        <div id="chart-band"></div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <section class="grid2">
+    <div class="block"><header><h2>Top ten students</h2><p class="sub">Highest average score.</p></header><div id="list-top"></div></div>
+    <div class="block"><header><h2>Students needing support</h2><p class="sub" id="weak-sub"></p></header><div id="list-weak"></div></div>
+  </section>
+
+  <hr class="rule">
+
+  <section class="block">
+    <div class="reg-head">
+      <header><h2>Student register</h2><p class="sub" id="reg-sub"></p></header>
+      <div class="rowline">
+        <input id="search" type="search" placeholder="Search a name" aria-label="Search a student name">
+        <button class="btn small" id="btn-copy" type="button">Copy summary for Excel</button>
+      </div>
+    </div>
+    <div class="split">
+      <div class="tablewrap"><table id="table"><thead></thead><tbody></tbody></table></div>
+      <aside class="profile" id="profile" aria-live="polite"></aside>
+    </div>
+  </section>
+
+  <footer id="foot"></footer>
+  </div>
+</div>
+<div id="tip" hidden></div>
+
+<!-- SheetJS: the library that reads Excel files -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<!-- Our own logic (reading the sheet, maths, charts) -->
+<script src="app.js"></script>
+</body>
+</html>
